@@ -1,0 +1,190 @@
+blueprint:
+  name: Ultimatesensor - CO2 Colors
+  description: Automates the RGB light based on CO2 sensor values with optional light off.
+  domain: automation
+  input:
+    co2_sensor:
+      name: CO2 Sensor
+      description: The CO2 sensor to monitor.
+      selector:
+        entity:
+          domain: sensor
+    rgb_light:
+      name: RGB Light
+      description: The RGB light to control.
+      selector:
+        entity:
+          domain: light
+    light_off:
+      name: Light Off
+      description: Option to turn off the light after the delay.
+      default: true
+      selector:
+        boolean:
+    check_interval:
+      name: Check Interval
+      description: Interval to check CO2 levels (in minutes).
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 60
+          unit_of_measurement: minutes
+    active_hours_start:
+      name: Active Hours Start
+      description: Time to start monitoring.
+      default: "08:00:00"
+      selector:
+        time:
+    active_hours_end:
+      name: Active Hours End
+      description: Time to stop monitoring.
+      default: "23:00:00"
+      selector:
+        time:
+  source_url: https://gist.github.com/your-gist-url
+
+trigger:
+  - platform: time_pattern
+    minutes: !input check_interval
+
+condition:
+  - condition: not
+    conditions:
+      - condition: time
+        after: !input active_hours_end
+        before: !input active_hours_start
+
+action:
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: !input co2_sensor
+            above: 350
+            below: 600
+        sequence:
+          - service: light.turn_on
+            data:
+              rgb_color: [0, 0, 255]
+            target:
+              entity_id: !input rgb_light
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ !input light_off }}"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: !input rgb_light
+      - conditions:
+          - condition: numeric_state
+            entity_id: !input co2_sensor
+            above: 600
+            below: 800
+        sequence:
+          - service: light.turn_on
+            data:
+              rgb_color: [0, 255, 225]
+            target:
+              entity_id: !input rgb_light
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ !input light_off }}"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: !input rgb_light
+      - conditions:
+          - condition: numeric_state
+            entity_id: !input co2_sensor
+            above: 800
+            below: 1000
+        sequence:
+          - service: light.turn_on
+            data:
+              rgb_color: [0, 200, 0]
+            target:
+              entity_id: !input rgb_light
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ !input light_off }}"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: !input rgb_light
+      - conditions:
+          - condition: numeric_state
+            entity_id: !input co2_sensor
+            above: 1000
+            below: 1200
+        sequence:
+          - service: light.turn_on
+            data:
+              rgb_color: [135, 245, 77]
+            target:
+              entity_id: !input rgb_light
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ !input light_off }}"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: !input rgb_light
+      - conditions:
+          - condition: numeric_state
+            entity_id: !input co2_sensor
+            above: 1200
+            below: 2000
+        sequence:
+          - service: light.turn_on
+            data:
+              rgb_color: [250, 175, 0]
+            target:
+              entity_id: !input rgb_light
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ !input light_off }}"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: !input rgb_light
+      - conditions:
+          - condition: numeric_state
+            entity_id: !input co2_sensor
+            above: 2000
+            below: 5000
+        sequence:
+          - repeat:
+              sequence:
+                - service: light.turn_on
+                  data:
+                    rgb_color: [250, 0, 0]
+                    flash: long
+                  target:
+                    entity_id: !input rgb_light
+                - delay:
+                    seconds: 1
+                - service: light.turn_off
+                  target:
+                    entity_id: !input rgb_light
+                - delay:
+                    seconds: 1
+              until:
+                - condition: numeric_state
+                  entity_id: !input co2_sensor
+                  below: 2000
+mode: single
