@@ -42,7 +42,7 @@ blueprint:
       default: "23:00:00"
       selector:
         time:
-  source_url: https://gist.github.com/your-gist-url
+  source_url: https://github.com/Diondk/homeassistant-blueprints/tree/main/Ultimatesensor%20blueprints
 
 trigger:
   - platform: time_pattern
@@ -73,7 +73,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ !input light_off }}"
+                    value_template: "{{ input_boolean.light_off }}"
                 sequence:
                   - service: light.turn_off
                     target:
@@ -94,7 +94,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ !input light_off }}"
+                    value_template: "{{ input_boolean.light_off }}"
                 sequence:
                   - service: light.turn_off
                     target:
@@ -115,7 +115,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ !input light_off }}"
+                    value_template: "{{ input_boolean.light_off }}"
                 sequence:
                   - service: light.turn_off
                     target:
@@ -136,7 +136,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ !input light_off }}"
+                    value_template: "{{ input_boolean.light_off }}"
                 sequence:
                   - service: light.turn_off
                     target:
@@ -157,7 +157,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ !input light_off }}"
+                    value_template: "{{ input_boolean.light_off }}"
                 sequence:
                   - service: light.turn_off
                     target:
